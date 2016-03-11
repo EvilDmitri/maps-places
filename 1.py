@@ -7,27 +7,9 @@ import sys
 
 gmaps = googlemaps.Client(key='AIzaSyDXcQ99Del7RZudfT9A6fMyhxjMzqtBEkw')
 
-# details = gmaps.place('ChIJKzuuWxK1RIYRbL2S4MBsY98')
-# photo = gmaps.photo('CmRdAAAA6mSDKYe6uwjFgHE4Npf8fFfwkp_VwBfEQta3-QGG0XVgzPdfwDFzpPLDCFShePrJBuiMv2bT_cbpvRtV5XIf27fr9-FTyoClmluwcI_oxKJpzyYKTdfX1kaUDeUK79kNEhA0H2Mn884LLiU3IAuTeStqGhT3pYhpmNPv__ywv0d_F5JnIHP5Gg')
-# f = open('photo.png', 'wb')
-# for chunk in gmaps.places_photo('CmRdAAAA6mSDKYe6uwjFgHE4Npf8fFfwkp_VwBfEQta3-QGG0XVgzPdfwDFzpPLDCFShePrJBuiMv2bT_cbpvRtV5XIf27fr9-FTyoClmluwcI_oxKJpzyYKTdfX1kaUDeUK79kNEhA0H2Mn884LLiU3IAuTeStqGhT3pYhpmNPv__ywv0d_F5JnIHP5Gg', max_width=1000):
-#     if chunk:
-#         f.write(chunk)
-# f.close()
-
-# obj = json.dumps(details, indent=4)
-
-# print obj
-# print details["result"]["geometry"]["location"]["lat"]
-
 LOCATION = {'lat': 41.0, 'lng': -74.0}
 RADIUS = '2000'
-
 QUERY = 'ice cream'
-
-# places = gmaps.places(query='ice cream', location=LOCATION,radius=RADIUS)
-# obj = json.dumps(places, indent=4)
-# print obj
 
 
 # Prepare output file to write
@@ -39,16 +21,18 @@ result_file.writerow(['name', 'address', 'place_id', 'id', 'URL',
 
 # Get one page with places
 def get_places(query=None, location=None, radius=None, page_token=None):
-    places = gmaps.places(query=QUERY, location=LOCATION, radius=RADIUS, page_token=page_token)
-    obj = json.dumps(places, indent=4)
-    print obj
+    # places = gmaps.places(query=QUERY, location=LOCATION, radius=RADIUS, page_token=page_token)
+    print 'Searching ' + query, 'in: ' + location
+    places = gmaps.places(query=query, location=location, radius=radius, page_token=page_token)
+    # obj = json.dumps(places, indent=4)
+    # print obj
 
     for result in places["results"]:
         get_place_details(result["place_id"])
 
     try:
         next_page = places["next_page_token"]
-        get_places(query=QUERY, location=LOCATION, radius=RADIUS, page_token=places["next_page_token"])
+        get_places(query=query, location=location, radius=radius, page_token=next_page)
     except KeyError:
         pass
 
@@ -56,6 +40,8 @@ def get_places(query=None, location=None, radius=None, page_token=None):
 def get_place_details(place_id):
     details = gmaps.place(place_id)
     result = details["result"]
+
+    print 'Getting the: ', result["name"].encode('utf-8')
 
     # obj = json.dumps(result, indent=4)
     # print obj
@@ -149,11 +135,17 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(argv, "hq:l:r:", ["query=", "location=", "radius="])
     except getopt.GetoptError:
-        print sys.argv[0] + ' -q <query> -l <location> -r <radius>'
+        print 'Usage: ' + sys.argv[0] + ' -q <query> -l <location> -r <radius>'
         sys.exit(2)
+
+    if len(opts) < 1:
+        print 'Please enter a query and location where to search'
+        print 'Usage: ' + sys.argv[0] + ' -q <query> -l <location> -r <radius>'
+        sys.exit(2)
+
     for opt, arg in opts:
         if opt == '-h':
-            print sys.argv[0] + ' -q <query> -l <location> -r <radius>'
+            print 'Usage: ' + sys.argv[0] + ' -q <query> -l <location> -r <radius>'
             sys.exit()
         elif opt in ("-q", "--query"):
             query = arg
