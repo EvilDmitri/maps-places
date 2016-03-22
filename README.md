@@ -24,7 +24,7 @@ virtualenv --no-site-packages maps-places
 
 activate:
 -------------------------------------------
-source /maps-places/bin/activate
+source maps-places/bin/activate
 
 
 install libraries:
@@ -37,7 +37,6 @@ Exit virtual environment
 deactivate
 
 
-run  (absolute path):
+Usage:
 -------------------------------------------
-~/venv/maps-places/bin/python 1.py
-
+maps-places/bin/python script.py -q "some query" -l "{'lat': 41.0, 'lng': -74.0}" -r "radius"
