@@ -25,6 +25,7 @@ virtualenv --no-site-packages maps-places
 activate:
 -------------------------------------------
 Linux: source maps-places/bin/activate
+
 Windows: maps-places\Scripts\activate
 
 
